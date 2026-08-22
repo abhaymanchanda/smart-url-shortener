@@ -50,18 +50,27 @@ public class WebSecurityConfig {
         return authProvider;
     }
 
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/urls/**").authenticated()
-                        .requestMatchers("/{shortUrl}").permitAll()
-                        .anyRequest().authenticated()
-                );
-        http.authenticationProvider(authenticationProvider());
-        http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
-        return http.build();
-    }
+   @Bean
+public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+
+    http
+        .csrf(AbstractHttpConfigurer::disable)
+        .cors(cors -> {})
+        .authorizeHttpRequests(auth -> auth
+            .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+            .requestMatchers("/api/auth/**").permitAll()
+            .requestMatchers("/api/urls/**").authenticated()
+            .requestMatchers("/{shortUrl}").permitAll()
+            .anyRequest().authenticated()
+        );
+
+    http.authenticationProvider(authenticationProvider());
+
+    http.addFilterBefore(
+        jwtAuthenticationFilter(),
+        UsernamePasswordAuthenticationFilter.class
+    );
+
+    return http.build();
+}
 }
